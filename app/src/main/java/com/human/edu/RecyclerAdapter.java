@@ -51,8 +51,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemVi
         void onItemVClick(View v, int position);
     }
 
-    public void setmOnItemClickListener(OnItemClickListener mOnItemClickListener) {
-        this.mOnItemClickListener = mOnItemClickListener;
+    //인터페이스 온클릭리스너에 대한 셋 메서드 생성(SubActivity에서 사용)
+    public void setOnItemClickListner(OnItemClickListener onItemClickListner) {
+        mOnItemClickListener = onItemClickListner;
     }
 
     public void setmList(List mList) {

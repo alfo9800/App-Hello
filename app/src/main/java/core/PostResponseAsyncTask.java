@@ -38,6 +38,11 @@ public class PostResponseAsyncTask extends AsyncTask<String, Void, String> {
         this.asyncResponse = asyncResponse;//비동기 통신을 종료할때의 결과를 출력
     }
 
+    public PostResponseAsyncTask(Context context, AsyncResponse asyncResponse) {
+        this.context = context;
+        this.asyncResponse = asyncResponse;
+    }
+
     public Context getContext() {
         return context;
     }
