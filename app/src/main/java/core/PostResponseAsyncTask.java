@@ -13,7 +13,7 @@ import java.util.HashMap;
 /**
  * 이 클래스는 AsyncTask 클래스를 상속받아서 비동기 통신(백그라운드작업) 기능 구현
  */
-public class PostResponseAsyncTask extends AsyncTask {
+public class PostResponseAsyncTask extends AsyncTask<String, Void, String> {
     //멤버변수 = 필드변수
     private Context context;
     private HashMap<String, String> postDataParams = new HashMap<String, String>();
@@ -76,13 +76,6 @@ public class PostResponseAsyncTask extends AsyncTask {
         this.showLoadingMessage = showLoadingMessage;
     }
 
-    @Override
-    protected Object doInBackground(String[] requestUrls) {
-        //비동기 통신에서 요청사항을 스프링앱에서 응답받는 기능
-        String result = "";
-        result = invokePost(requestUrls[0], postDataParams);
-        return result;
-    }
 
     private String invokePost(String requestUrl, HashMap<String, String> postDataParams) {
         URL url;
@@ -97,5 +90,13 @@ public class PostResponseAsyncTask extends AsyncTask {
             e.printStackTrace();
         }
         return response;
+    }
+
+    @Override
+    protected String doInBackground(String... requestUrls) {
+        //비동기 통신에서 요청사항을 스프링앱에서 응답받는 기능
+        String result = "";
+        result = invokePost(requestUrls[0], postDataParams);
+        return result;
     }
 }
