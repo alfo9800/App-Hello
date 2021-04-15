@@ -1,6 +1,7 @@
 package com.human.edu;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -27,7 +28,12 @@ import core.PostResponseAsyncTask;
 public class SubActivity extends AppCompatActivity {
     //리사이클러 뷰를 사용할 멤버변수(=필드변수) 생성
     private RecyclerAdapter mRecyclerAdapter;
+    private RecyclerAdapter mRecyclerAdapter2;
     private List mItemList = new ArrayList<MemberVO>();
+
+    //리사이클러 레이아웃 뷰 멤버변수 생성
+    RecyclerView recyclerView;
+    RecyclerView recyclerView2;
 
     //어댑터에서 선택한 값 확인 변수(선택한 회원을 삭제하기 위해서)
     private String currentCursorId = "";
@@ -39,13 +45,20 @@ public class SubActivity extends AppCompatActivity {
 
         //객체 생성
         mRecyclerAdapter = new RecyclerAdapter(mItemList);
+        mRecyclerAdapter2 = new RecyclerAdapter(mItemList);
 
         //리사이클러뷰xml과 어댑터 클래스를 바인딩
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true); //리사이클러 뷰의 높이를 고정함
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mRecyclerAdapter); //데이터없는 빈 어댑터를 뷰화면에 바인딩 시킴
-        getAllData();
+        //리사이클러뷰xml2와 어댑터클래스를 바인딩
+        recyclerView2 = findViewById(R.id.recyclerView2);
+        recyclerView2.setHasFixedSize(true);
+        recyclerView2.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView2.setAdapter(mRecyclerAdapter);
+
+        getAllData(); //1개의 메소드로 2개의 어댑터를 갱신.
         mRecyclerAdapter.setOnItemClickListner(new RecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemVClick(View v, int position) {
@@ -53,6 +66,24 @@ public class SubActivity extends AppCompatActivity {
                 currentCursorId = memberVO.getUser_id();
                 //Toast.makeText(getApplicationContext(),"현재 선택한 회원ID는 "+currentCursorId, Toast.LENGTH_LONG).show();
                 deleteUserData(position, currentCursorId);
+            }
+        });
+        //선택한 회원 메일 보내기
+        mRecyclerAdapter2.setOnItemClickListner(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemVClick(View v, int position) {
+                MemberVO memberVO = (MemberVO) mItemList.get(position);
+                String userEmail = memberVO.getEmail();
+                String userName = memberVO.getUser_name();
+                Intent mailIntent = new Intent(Intent.ACTION_SEND);
+                mailIntent.setType("plain/text");
+                String[] address = {userEmail};
+                
+                //put은 해시데이터(key,value)에 값을 입력할 때 사용
+                mailIntent.putExtra(Intent.EXTRA_EMAIL, address);
+                mailIntent.putExtra(Intent.EXTRA_SUBJECT, "[사이트 공지사항]");
+                mailIntent.putExtra(Intent.EXTRA_TEXT, userName+"님 안녕하세요!");
+                startActivity(mailIntent); //스마트폰의 메일앱을 띄움
             }
         });
     }
@@ -121,6 +152,7 @@ public class SubActivity extends AppCompatActivity {
                 mItemList.clear();
                 mItemList.addAll(resultList);
                 mRecyclerAdapter.notifyDataSetChanged(); //어댑터 객체가 리프레시 됨
+                mRecyclerAdapter2.notifyDataSetChanged(); //데이터 변경사항을 공지
             }
         });
         readTask.execute(requestUrl); //비동기 통신 시작명령
